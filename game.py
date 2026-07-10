@@ -22,9 +22,7 @@ c1_img = pg.image.load("obstacles/cactus1.png").convert_alpha()
 cactus_sf = pg.transform.scale_by(c1_img, 2)
 cactus_rect = cactus_sf.get_rect(midbottom = (1000, 430))
 
-cactus_x = 1000
-
-speed_x = 0
+speed_y = 0
 
 while True:
     for event in pg.event.get():
@@ -32,32 +30,38 @@ while True:
         if event.type == pg.QUIT:
             pg.quit()
             exit()
+        
+        #Mouse 1
         # if event.type == pg.MOUSEMOTION: #if move mouse
             #  if player_rect.collidepoint(event.pos):
             #     print("collide with mouse")
         # if event.type == pg.MOUSEBUTTONDOWN:
         #     print("mouse down")
 
-    #blit = show
+        # if event.type == pg.KEYDOWN:
+        #     if event.key == pg.K_SPACE or event.key == pg.K_UP or event.key == pg.K_w:
+        #         if dino_rect.bottom == 430:
+        #             speed_x = -20
+
     screen.blit(bg_sf, (0, 0))
 
     screen.blit(dino_sf, dino_rect)
     
     screen.blit(cactus_sf, cactus_rect)
-    cactus_rect.x -= 7
+    cactus_rect.x -= 10
     if cactus_rect.right <= 0:
         cactus_rect.left = 1000
 
     keys = pg.key.get_pressed()
-    if keys[pg.K_SPACE]:
+    if keys[pg.K_SPACE] or keys[pg.K_UP] or keys[pg.K_w]:
         if dino_rect.bottom == 430:
-            speed_x = -22
+            speed_y = -20
 
-    speed_x += 1
-    dino_rect.top += speed_x
+    speed_y += 1
+    dino_rect.top += speed_y
     if dino_rect.bottom >= 430:
         dino_rect.bottom = 430
-        speed_x = 0
+        speed_y = 0
 
     screen.blit(score_sf, score_rect)
 
