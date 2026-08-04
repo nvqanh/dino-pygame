@@ -24,20 +24,23 @@ pg.display.set_icon(icon)
 pg.display.set_caption("Dino Run")
 clock = pg.time.Clock()
 
-bg_sf = pg.image.load("background.png").convert_alpha()
+# bg_sf = pg.image.load("background.png").convert_alpha()
+ground_sf = pg.image.load("ground.png").convert_alpha()
+ground_rect1 = ground_sf.get_rect(bottomleft = (0, 600))
+ground_rect2 = ground_sf.get_rect(bottomleft = (1000, 600))
 
-font = pg.font.Font("fonts/ari-w9500-condensed-display.ttf", 35)
+font = pg.font.Font("fonts/ari-w9500-display.ttf", 35)
 
 idle_img = pg.image.load("player/dino-idle.png").convert_alpha() # Loads an image and convert it to pygame
-dino_sf = pg.transform.scale_by(idle_img, 5) # Makes a surface, aka image on screen, with that image
+dino_sf = pg.transform.scale_by(idle_img, 5.2) # Makes a surface, aka image on screen, with that image
 dino_rect = dino_sf.get_rect(midbottom = (100, 430)) # Makes a rectangle (box) with that image
 
 c1_img = pg.image.load("obstacles/cactus1.png").convert_alpha()
-cactus_sf = pg.transform.scale_by(c1_img, 2)
+cactus_sf = pg.transform.scale_by(c1_img, 2.3)
 cactus_rect = cactus_sf.get_rect(midbottom = (1500, 430))
 
 player_speed_y = 0
-cactus_speed_x = 8
+speed_x = 8
 
 cooldown = 20
 
@@ -45,7 +48,13 @@ ingame = True
 
 start_time = pg.time.get_ticks()
 score = 0
-high_score = 0
+
+# Loads high score from highscore.txt
+try:
+    with open("highscore.txt", "r") as file:
+        high_score = int(file.read())
+except:
+    high_score = 0
 
 while True:
     for event in pg.event.get():
@@ -59,7 +68,7 @@ while True:
             cactus_rect.midbottom = (1500, 430)
 
             player_speed_y = 0
-            cactus_speed_x = 8
+            speed_x = 8
 
             ingame = True
             cooldown = 20
@@ -70,13 +79,26 @@ while True:
     if ingame:
         score = int((pg.time.get_ticks() - start_time) / 100)
 
-        screen.blit(bg_sf, (0, 0))
+        # screen.blit(bg_sf, (0, 0))
+        screen.fill((32, 33, 36))
 
+        screen.blit(ground_sf, ground_rect1)
+        screen.blit(ground_sf, ground_rect2)
+
+        # When a ground rect goes out of the screen, move it to exactly the right of the other
+
+        ground_rect1.x -= speed_x
+        ground_rect2.x -= speed_x
+        if ground_rect1.right <= 0:
+            ground_rect1.left = ground_rect2.right
+        elif ground_rect2.right <= 0:
+            ground_rect2.left = ground_rect1.right
+ 
         screen.blit(dino_sf, dino_rect)
         
         screen.blit(cactus_sf, cactus_rect)
-        cactus_rect.x -= cactus_speed_x
-        if cactus_speed_x <= 25: cactus_speed_x += .001
+        cactus_rect.x -= speed_x
+        if speed_x <= 25: speed_x += .001
         if cactus_rect.right <= 0:
             cactus_rect.left = 1000
 
@@ -99,6 +121,10 @@ while True:
             ingame = False
             if score > high_score:
                 high_score = score
+
+                # with open() is recommended
+                with open("highscore.txt", "w") as file:
+                    file.write(str(high_score))
 
         display_score()
         display_high_score()
