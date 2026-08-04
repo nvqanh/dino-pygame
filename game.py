@@ -3,17 +3,17 @@ from sys import exit
 
 def display_score():
     global score
-    global font
+    global font1
     global start_time
-    score_sf = font.render(f"{score:05d}", False, "gray75")
+    score_sf = font1.render(f"{score:05d}", False, "gray75")
     score_rect = score_sf.get_rect(midtop = (900, 50))
     screen.blit(score_sf, score_rect)
 
 def display_high_score():
     global high_score
-    global font
+    global font1
     global start_time
-    high_score_sf = font.render(f"HI {high_score:05d}", False, "gray60")
+    high_score_sf = font1.render(f"HI {high_score:05d}", False, "gray60")
     high_score_rect = high_score_sf.get_rect(midtop = (720, 50))
     screen.blit(high_score_sf, high_score_rect)
 
@@ -29,7 +29,9 @@ ground_sf = pg.image.load("ground.png").convert_alpha()
 ground_rect1 = ground_sf.get_rect(bottomleft = (0, 600))
 ground_rect2 = ground_sf.get_rect(bottomleft = (1000, 600))
 
-font = pg.font.Font("fonts/ari-w9500-display.ttf", 35)
+font1 = pg.font.Font("fonts/ari-w9500-display.ttf", 35)
+font2 = pg.font.Font("fonts/ari-w9500-display.ttf", 50)
+font3 = pg.font.Font("fonts/ari-w9500-bold.ttf", 35)
 
 idle_img = pg.image.load("player/dino-idle.png").convert_alpha() # Loads an image and convert it to pygame
 dino_sf = pg.transform.scale_by(idle_img, 5.2) # Makes a surface, aka image on screen, with that image
@@ -38,6 +40,11 @@ dino_rect = dino_sf.get_rect(midbottom = (100, 430)) # Makes a rectangle (box) w
 c1_img = pg.image.load("obstacles/cactus1.png").convert_alpha()
 cactus_sf = pg.transform.scale_by(c1_img, 2.3)
 cactus_rect = cactus_sf.get_rect(midbottom = (1500, 430))
+
+game_over_sf = font2.render("GAME OVER", False, "gray75")
+game_over_rect = game_over_sf.get_rect(midtop = (500, 200))
+restart_txt_sf = font3.render("Space or Click to restart", False, "gray75")
+restart_txt_rect = restart_txt_sf.get_rect(midtop = (500, 275))
 
 player_speed_y = 0
 speed_x = 8
@@ -128,6 +135,9 @@ while True:
 
         display_score()
         display_high_score()
+    else:
+        screen.blit(game_over_sf, game_over_rect)
+        screen.blit(restart_txt_sf, restart_txt_rect)
 
     # 60 FPS
     pg.display.update()
