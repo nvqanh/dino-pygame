@@ -1,4 +1,12 @@
+# TODO:
+# - Animations for dino
+# - Different cactus types
+# - Multiple cactus rects <implementing>
+# - Pterodactyls
+# - Moon and stars
+
 import pygame as pg
+import random
 from sys import exit
 
 def display_score():
@@ -24,7 +32,9 @@ pg.display.set_icon(icon)
 pg.display.set_caption("Dino Run")
 clock = pg.time.Clock()
 
-# bg_sf = pg.image.load("background.png").convert_alpha()
+# NOTE: width 1000 height 600
+
+bg_sf = pg.image.load("background.png").convert_alpha()
 ground_sf = pg.image.load("ground.png").convert_alpha()
 ground_rect1 = ground_sf.get_rect(bottomleft = (0, 600))
 ground_rect2 = ground_sf.get_rect(bottomleft = (1000, 600))
@@ -39,11 +49,12 @@ dino_rect = dino_sf.get_rect(midbottom = (100, 430)) # Makes a rectangle (box) w
 
 c1_img = pg.image.load("obstacles/cactus1.png").convert_alpha()
 cactus_sf = pg.transform.scale_by(c1_img, 2.3)
-cactus_rect = cactus_sf.get_rect(midbottom = (1500, 430))
+cactus_rect1 = cactus_sf.get_rect(midbottom = (1500, 430))
+cactus_rect2 = cactus_sf.get_rect(midbottom = (2500, 430))
 
 game_over_sf = font2.render("GAME OVER", False, "gray75")
 game_over_rect = game_over_sf.get_rect(midtop = (500, 200))
-restart_txt_sf = font3.render("Space or Click to restart", False, "gray75")
+restart_txt_sf = font3.render("Space or Click to restart", False, "gray60")
 restart_txt_rect = restart_txt_sf.get_rect(midtop = (500, 275))
 
 player_speed_y = 0
@@ -64,6 +75,7 @@ except:
     high_score = 0
 
 while True:
+    # Event loop
     for event in pg.event.get():
         # Check if you want to exit
         if event.type == pg.QUIT:
@@ -72,7 +84,11 @@ while True:
 
         if not ingame and ((event.type == pg.KEYDOWN and event.key in (pg.K_SPACE, pg.K_UP)) or event.type == pg.MOUSEBUTTONDOWN):
             dino_rect.midbottom = (100, 430)
-            cactus_rect.midbottom = (1500, 430)
+            cactus_rect1.midbottom = (1500, 430)
+            cactus_rect2.midbottom = (2500, 430)
+
+            ground_rect1.left = 0
+            ground_rect2.left = 1000
 
             player_speed_y = 0
             speed_x = 8
@@ -86,8 +102,8 @@ while True:
     if ingame:
         score = int((pg.time.get_ticks() - start_time) / 100)
 
-        # screen.blit(bg_sf, (0, 0))
-        screen.fill((32, 33, 36))
+        screen.blit(bg_sf, (0, 0))
+        # screen.fill((32, 33, 36))
 
         screen.blit(ground_sf, ground_rect1)
         screen.blit(ground_sf, ground_rect2)
@@ -103,28 +119,43 @@ while True:
  
         screen.blit(dino_sf, dino_rect)
         
-        screen.blit(cactus_sf, cactus_rect)
-        cactus_rect.x -= speed_x
+        screen.blit(cactus_sf, cactus_rect1)
+        screen.blit(cactus_sf, cactus_rect2)
+        cactus_rect1.x -= speed_x
+        cactus_rect2.x -= speed_x
+
+        #Spawns cacti
         if speed_x <= 25: speed_x += .001
-        if cactus_rect.right <= 0:
-            cactus_rect.left = 1000
+        if cactus_rect1.right <= 0:
+            if cactus_rect2.right < 1000:
+                #Try to spawn from the right but if the two cacti are too close then keep a distance of 300-500
+                cactus_rect1.left = max(random.randint(1000, 2000), cactus_rect2.right + random.randint(300, 500))
+            else:
+                cactus_rect1.left = cactus_rect2.right + random.randint(300, 1500)
+        if cactus_rect2.right <= 0:
+            if cactus_rect1.right < 1000:
+                cactus_rect2.left = max(random.randint(1000, 2000), cactus_rect1.right + random.randint(300, 500))
+                cactus_rect2.left = cactus_rect1.right + random.randint(300, 1500)
 
         keys = pg.key.get_pressed()
         if (keys[pg.K_SPACE] or keys[pg.K_UP] or pg.mouse.get_pressed()[0]) and cooldown == 0:
             if dino_rect.bottom == 430:
-                player_speed_y = -20
+                player_speed_y = -22
         
         if cooldown > 0:
             cooldown -= 1
 
-        player_speed_y += 1
+        if keys[pg.K_DOWN]:
+            player_speed_y += 3
+        else: player_speed_y += 1
+
         dino_rect.y += player_speed_y
         if dino_rect.bottom >= 430:
             dino_rect.bottom = 430
             player_speed_y = 0
 
         # Game over
-        if dino_rect.inflate(-80, -50).colliderect(cactus_rect.inflate(-30, -10)):
+        if dino_rect.inflate(-80, -50).colliderect(cactus_rect1.inflate(-30, -10)) or dino_rect.inflate(-80, -50).colliderect(cactus_rect2.inflate(-30, -10)):
             ingame = False
             if score > high_score:
                 high_score = score
