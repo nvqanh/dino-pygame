@@ -7,3 +7,4 @@ Credits:
 - The employees at Google for creating the original game
 - The YouTube video ["The Ultimate introduction to Pygame"](https://youtu.be/AY9MnQ4x3zk), which helped me learn the library. Part of the code is also from it (with modifications).
 - [Another awesome resource for learning to code with pygame](https://youtu.be/dQw4w9WgXcQ)
+- Whoever created the fonts I used (sorry I forgot the source)
